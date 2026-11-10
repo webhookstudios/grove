@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Spool
+GenericName=App Library
+Comment=Install, update and remove webhookstudios apps
+Exec=@EXEC@
+Icon=@ICON@
+Terminal=false
+StartupNotify=true
+Categories=System;PackageManager;GTK;
+Keywords=apps;install;update;store;library;webhookstudios;
+StartupWMClass=io.github.webhookstudios.Spool
