@@ -15,8 +15,6 @@ One library for every [webhookstudios](https://github.com/webhookstudios) app on
 - **Works offline** with the last list it saw, and tells you it may be out of date.
 - Downloads are checked against the checksum GitHub publishes before anything is installed.
 
-![An app's details, with its screenshots](docs/screenshots/details.png)
-
 ## Requirements
 
 - Ubuntu 26.04 (any recent Debian-based system with GTK 4 and libadwaita 1.5 or later should work)
