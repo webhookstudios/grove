@@ -1,6 +1,6 @@
 .spool-card { padding: 16px; }
 .spool-card:hover { background-color: alpha(currentColor, 0.04); }
-.spool-name { font-weight: 700; font-size: 15px; }
+.spool-name { font-family: "Young Serif", Georgia, serif; font-weight: normal; font-size: 16px; }
 .spool-badge { font-size: 11px; font-weight: 600; padding: 1px 8px; border-radius: 99px;
   background-color: alpha(currentColor, 0.10); }
 .spool-badge.update { background-color: alpha(@accent_bg_color, 0.25); color: @accent_color; }

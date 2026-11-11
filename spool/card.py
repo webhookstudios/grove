@@ -1,17 +1,25 @@
+import os
 import threading
 
-from gi.repository import GLib, Gtk
+from gi.repository import Gio, GLib, Gtk
 
 from . import OWNER, packages
 from .github import fetch_cached, icon_urls
 from .model import human_size
 
+SEDGE_ICONS = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'sedge', 'apps')
+
 
 def load_icon(image, entry):
-    """Shows the app's own icon: the installed one if there is one, otherwise
-    the picture from its repo, downloaded once."""
+    """Shows the app's own icon: its Sedge icon if Grove carries one, then the
+    installed one, otherwise the picture from its repo, downloaded once."""
+    bundled = os.path.join(SEDGE_ICONS, f'{entry.title.lower()}.svg')
+    if os.path.exists(bundled):
+        image.set_from_gicon(Gio.FileIcon.new(Gio.File.new_for_path(bundled)))
+        return
     theme = Gtk.IconTheme.get_for_display(image.get_display())
-    for name in (f'io.github.{OWNER}.{entry.title}', entry.info.repo):
+    app_id_name = entry.info.repo[:1].upper() + entry.info.repo[1:]  # app ids keep the repo's name
+    for name in (f'io.github.{OWNER}.{app_id_name}', entry.info.repo):
         if theme.has_icon(name):
             image.set_from_icon_name(name)
             return

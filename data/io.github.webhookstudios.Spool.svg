@@ -1,18 +1,15 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff9d5c"/><stop offset="1" stop-color="#d9482b"/></linearGradient>
-    <linearGradient id="thread" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff4e6"/><stop offset="1" stop-color="#ffd6b0"/></linearGradient>
+    <linearGradient id="face" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e6eee8"/>
+      <stop offset="1" stop-color="#d2dfd6"/>
+    </linearGradient>
   </defs>
-  <rect x="8" y="8" width="112" height="112" rx="26" fill="url(#bg)"/>
-  <!-- Thread wound on the spool -->
-  <rect x="40" y="38" width="48" height="52" rx="6" fill="url(#thread)"/>
-  <g stroke="#e08a55" stroke-width="2.5" opacity=".55" stroke-linecap="round">
-    <path d="M42 48H86"/><path d="M42 56H86"/><path d="M42 64H86"/><path d="M42 72H86"/><path d="M42 80H86"/>
+  <circle cx="64" cy="67" r="54" fill="#1e2b26" fill-opacity=".16"/>
+  <circle cx="64" cy="63" r="54" fill="url(#face)"/>
+  <circle cx="64" cy="63" r="52.5" fill="none" stroke="#247268" stroke-width="3"/>
+  <g transform="translate(64 63) scale(2.55) translate(-12 -12)" fill="none" stroke="#247268"
+     stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 8h16l-1.4 12H5.4z M9 8V6.5a3 3 0 0 1 6 0V8"/>
   </g>
-  <!-- Flanges -->
-  <rect x="30" y="28" width="68" height="12" rx="6" fill="#fff"/>
-  <rect x="30" y="88" width="68" height="12" rx="6" fill="#fff"/>
-  <!-- Loose end -->
-  <path d="M88 76C100 78 104 88 98 98" stroke="#fff4e6" stroke-width="3" fill="none" stroke-linecap="round"/>
 </svg>

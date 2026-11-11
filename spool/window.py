@@ -13,7 +13,7 @@ from .model import Entry
 
 class SpoolWindow(Adw.ApplicationWindow):
     def __init__(self, **kwargs):
-        super().__init__(title='Spool', default_width=1000, default_height=720, **kwargs)
+        super().__init__(title='Grove', default_width=1000, default_height=720, **kwargs)
         self.client = Client()
         self.entries = []
         self.cards = {}
@@ -40,7 +40,7 @@ class SpoolWindow(Adw.ApplicationWindow):
         self.refresh_button.connect('clicked', lambda *_: self.reload())
         header.pack_start(self.refresh_button)
 
-        about = Gtk.Button(icon_name='help-about-symbolic', tooltip_text='About Spool')
+        about = Gtk.Button(icon_name='help-about-symbolic', tooltip_text='About Grove')
         about.connect('clicked', self._on_about)
         header.pack_end(about)
         self.search = Gtk.SearchEntry(placeholder_text='Search apps', width_chars=22)
@@ -292,8 +292,8 @@ class SpoolWindow(Adw.ApplicationWindow):
 
     def _on_about(self, _button):
         about = Adw.AboutDialog(
-            application_name='Spool', application_icon=f'io.github.{OWNER}.Spool', version=__version__,
+            application_name='Grove', application_icon=f'io.github.{OWNER}.Spool', version=__version__,
             developer_name='webhookstudios', website=f'https://github.com/{OWNER}/spool',
-            comments='One library to install, update and remove every webhookstudios app.',
+            comments='One library to install, update and remove every webhookstudios app.\n\nPart of the Sedge family of apps.',
             license_type=Gtk.License.GPL_2_0)
         about.present(self)

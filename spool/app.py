@@ -16,6 +16,8 @@ class SpoolApplication(Adw.Application):
     def do_startup(self):
         Adw.Application.do_startup(self)
         import os
+        from . import sedge
+        sedge.apply()
         css = Gtk.CssProvider()
         css.load_from_path(os.path.join(os.path.dirname(__file__), 'style.css'))
         Gtk.StyleContext.add_provider_for_display(

@@ -1,12 +1,14 @@
-# Spool
+# Grove
+
+*Formerly Spool. Part of the Sedge family of webhookstudios apps.*
 
 One library for every [webhookstudios](https://github.com/webhookstudios) app on Ubuntu. Browse them as cards, install, update or remove any of them with a click, and see new versions as soon as you open it.
 
-![The Spool library](docs/screenshots/library.png)
+![The Grove library](docs/screenshots/library.png)
 
 ## What it does
 
-- **Finds the apps by itself.** It reads webhookstudios' public repos on GitHub and lists every one whose latest release has a `.deb`. A new app shows up the day it is released, with no update to Spool.
+- **Finds the apps by itself.** It reads webhookstudios' public repos on GitHub and lists every one whose latest release has a `.deb`. A new app shows up the day it is released, with no update to Grove.
 - **Checks for updates every time it opens**, and shows a banner with an **Update all** button.
 - **Installs, updates and removes** through apt, so dependencies are handled and everything appears in the normal package list. You are asked for your password once, by the standard system prompt.
 - **Shows each app's details:** description, versions, size, release notes and its screenshots.
@@ -24,13 +26,13 @@ One library for every [webhookstudios](https://github.com/webhookstudios) app on
 
 ### With the deb package (recommended)
 
-Download `spool_1.0.0_all.deb` from the [latest release](https://github.com/webhookstudios/spool/releases/latest), then install it:
+Download `spool_1.1.0_all.deb` from the [latest release](https://github.com/webhookstudios/spool/releases/latest), then install it:
 
 ```bash
-sudo apt install ./spool_1.0.0_all.deb
+sudo apt install ./spool_1.1.0_all.deb
 ```
 
-Open **Spool** from the apps menu. After that, Spool can update itself like any other app in the list.
+Open **Grove** from the apps menu. After that, Grove can update itself like any other app in the list.
 
 To remove it:
 
@@ -62,11 +64,11 @@ git clone https://github.com/webhookstudios/spool.git
 
 The **Installed** and **Updates** tabs filter the list, and the search box matches names and descriptions.
 
-Shell extensions, such as Sprig and Sheaf, only turn on after you log out and back in. Spool reminds you when you install one.
+Shell extensions, such as Sprig and Sheaf, only turn on after you log out and back in. Grove reminds you when you install one.
 
 ## How it works
 
-Spool asks the GitHub API for the owner's repos and each one's latest release. Answers are cached in `~/.cache/spool` with their ETag, so an unchanged answer costs nothing against GitHub's limit of 60 requests an hour for anonymous use. Installed versions come from `dpkg-query`. Installing downloads the `.deb` files to a temporary folder and runs `apt-get install` through `pkexec`; removing runs `apt-get remove`.
+Grove asks the GitHub API for the owner's repos and each one's latest release. Answers are cached in `~/.cache/spool` with their ETag, so an unchanged answer costs nothing against GitHub's limit of 60 requests an hour for anonymous use. Installed versions come from `dpkg-query`. Installing downloads the `.deb` files to a temporary folder and runs `apt-get install` through `pkexec`; removing runs `apt-get remove`.
 
 | File | Purpose |
 |---|---|
@@ -78,7 +80,7 @@ Spool asks the GitHub API for the owner's repos and each one's latest release. A
 ## Limitations
 
 - Only apps with a `.deb` in their latest GitHub release are listed.
-- GitHub allows 60 anonymous requests an hour. Opening Spool uses about ten, and unchanged answers are free, so this is only a problem if you reopen it dozens of times in an hour.
+- GitHub allows 60 anonymous requests an hour. Opening Grove uses about ten, and unchanged answers are free, so this is only a problem if you reopen it dozens of times in an hour.
 - Removing an app keeps its settings, the way `apt remove` does.
 
 ## Development

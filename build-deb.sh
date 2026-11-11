@@ -19,6 +19,8 @@ install -d "$SHARE/spool" "$STAGE/DEBIAN" "$STAGE/usr/bin" \
     "$STAGE/usr/share/doc/spool"
 
 install -m 644 "$ROOT"/spool/*.py "$ROOT/spool/style.css" "$SHARE/spool/"
+cp -r "$ROOT/spool/sedge" "$SHARE/spool/"
+find "$SHARE/spool/sedge" -type f -exec chmod 644 {} +
 install -m 755 "$ROOT/bin/spool" "$STAGE/usr/bin/spool"
 install -m 644 "$ROOT/data/$APP_ID.svg" "$STAGE/usr/share/icons/hicolor/scalable/apps/"
 sed -e 's|@EXEC@|spool|' -e "s|@ICON@|$APP_ID|" "$ROOT/data/$APP_ID.desktop.in" \
@@ -27,7 +29,7 @@ chmod 644 "$STAGE/usr/share/applications/$APP_ID.desktop"
 
 cat > "$STAGE/usr/share/doc/spool/copyright" <<EOT
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: Spool
+Upstream-Name: Grove (formerly Spool)
 Source: https://github.com/webhookstudios/spool
 
 Files: *
@@ -35,6 +37,11 @@ Copyright: $(date +%Y) webhookstudios
 License: GPL-2+
  On Debian systems, the full text of the GNU General Public License
  version 2 can be found in /usr/share/common-licenses/GPL-2.
+
+Files: usr/share/spool/spool/sedge/fonts/*
+Copyright: 2023 The Young Serif Project Authors; 2015 The Public Sans Project Authors
+License: OFL-1.1
+ The full license texts are in usr/share/spool/spool/sedge/fonts/.
 EOT
 chmod 644 "$STAGE/usr/share/doc/spool/copyright"
 
@@ -48,8 +55,8 @@ Depends: python3, python3-gi, gir1.2-gtk-4.0, gir1.2-adw-1 (>= 1.5), apt, dpkg, 
 Section: utils
 Priority: optional
 Homepage: https://github.com/webhookstudios/spool
-Description: One library for all webhookstudios apps
- Spool lists every app published by webhookstudios on GitHub, installs and
+Description: Grove, one library for all webhookstudios apps
+ Grove (formerly Spool) lists every app published by webhookstudios on GitHub, installs and
  removes them with one click, and checks for new versions each time it
  opens. Installing and removing asks for your password once, through the
  normal system prompt.

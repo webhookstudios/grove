@@ -13,6 +13,12 @@ from . import OWNER, __version__
 
 API = 'https://api.github.com'
 RAW = 'https://raw.githubusercontent.com'
+# Sedge names for apps whose GitHub repos still use their old names.
+DISPLAY_NAMES = {
+    'spool': 'Grove', 'spur': 'Shore', 'sash': 'Burl', 'stoop': 'Den', 'shine': 'Fern',
+    'staple': 'Wayside', 'snip': 'Dewdrop', 'swell': 'Tide', 'scrawl': 'Leaf', 'slice': 'Paddock',
+    'gleam': 'Solstice', 'squint': 'Hawk', 'splice': 'Current',
+}
 CACHE_DIR = os.path.join(os.environ.get('XDG_CACHE_HOME') or os.path.expanduser('~/.cache'), 'spool')
 
 
@@ -138,7 +144,7 @@ class Client:
         tag = release.get('tag_name', '')
         return AppInfo(
             repo=repo['name'],
-            title=repo['name'][:1].upper() + repo['name'][1:],
+            title=DISPLAY_NAMES.get(repo['name'].lower(), repo['name'][:1].upper() + repo['name'][1:]),
             description=repo.get('description') or '',
             tag=tag,
             version=tag.lstrip('vV'),
@@ -207,5 +213,6 @@ def fetch_cached(url, name):
 
 def icon_urls(repo, title):
     """Where a repo keeps its icon: the app-id name first, then the repo name."""
+    title = repo[:1].upper() + repo[1:]  # app ids keep the repo's name
     base = f'{RAW}/{OWNER}/{repo}/HEAD/data'
     return [f'{base}/io.github.{OWNER}.{title}.svg', f'{base}/{repo}.svg']
