@@ -1,3 +1,3 @@
 __version__ = '1.1.0'
-APP_ID = 'io.github.webhookstudios.Spool'
+APP_ID = 'io.github.webhookstudios.Grove'
 OWNER = 'webhookstudios'

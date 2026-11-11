@@ -1,0 +1,14 @@
+#!/usr/bin/python3
+import os
+import sys
+
+# Installed: /usr/share/grove/grove. From a checkout: the folder next to bin/.
+here = os.path.dirname(os.path.realpath(__file__))
+for base in (os.path.join(here, '..', 'share', 'grove'), os.path.join(here, '..'), here):
+    if os.path.isdir(os.path.join(base, 'grove')):
+        sys.path.insert(0, os.path.abspath(base))
+        break
+
+from grove.__main__ import main
+
+sys.exit(main())

@@ -26,10 +26,10 @@ One library for every [webhookstudios](https://github.com/webhookstudios) app on
 
 ### With the deb package (recommended)
 
-Download `spool_1.1.0_all.deb` from the [latest release](https://github.com/webhookstudios/spool/releases/latest), then install it:
+Download `grove_1.1.0_all.deb` from the [latest release](https://github.com/webhookstudios/grove/releases/latest), then install it:
 
 ```bash
-sudo apt install ./spool_1.1.0_all.deb
+sudo apt install ./grove_1.1.0_all.deb
 ```
 
 Open **Grove** from the apps menu. After that, Grove can update itself like any other app in the list.
@@ -37,17 +37,17 @@ Open **Grove** from the apps menu. After that, Grove can update itself like any 
 To remove it:
 
 ```bash
-sudo apt remove spool
+sudo apt remove grove
 ```
 
 ### From source
 
 ```bash
-git clone https://github.com/webhookstudios/spool.git
+git clone https://github.com/webhookstudios/grove.git
 ```
 
 ```bash
-./spool/install.sh
+./grove/install.sh
 ```
 
 ## Using it
@@ -68,14 +68,14 @@ Shell extensions, such as Sprig and Sheaf, only turn on after you log out and ba
 
 ## How it works
 
-Grove asks the GitHub API for the owner's repos and each one's latest release. Answers are cached in `~/.cache/spool` with their ETag, so an unchanged answer costs nothing against GitHub's limit of 60 requests an hour for anonymous use. Installed versions come from `dpkg-query`. Installing downloads the `.deb` files to a temporary folder and runs `apt-get install` through `pkexec`; removing runs `apt-get remove`.
+Grove asks the GitHub API for the owner's repos and each one's latest release. Answers are cached in `~/.cache/grove` with their ETag, so an unchanged answer costs nothing against GitHub's limit of 60 requests an hour for anonymous use. Installed versions come from `dpkg-query`. Installing downloads the `.deb` files to a temporary folder and runs `apt-get install` through `pkexec`; removing runs `apt-get remove`.
 
 | File | Purpose |
 |---|---|
-| `spool/github.py` | Finds apps and releases, downloads and checks files |
-| `spool/packages.py` | Installed versions, install and remove through polkit |
-| `spool/window.py` | The main window, filters, install and update flows |
-| `spool/card.py`, `spool/details.py` | The app cards and the details window |
+| `grove/github.py` | Finds apps and releases, downloads and checks files |
+| `grove/packages.py` | Installed versions, install and remove through polkit |
+| `grove/window.py` | The main window, filters, install and update flows |
+| `grove/card.py`, `grove/details.py` | The app cards and the details window |
 
 ## Limitations
 
@@ -86,7 +86,7 @@ Grove asks the GitHub API for the owner's repos and each one's latest release. A
 ## Development
 
 ```bash
-python3 bin/spool
+python3 bin/grove
 ```
 
 Build the deb package into `dist/` with `./build-deb.sh` (needs only `dpkg-deb`).

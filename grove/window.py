@@ -11,7 +11,7 @@ from .github import Client, GitHubError, download
 from .model import Entry
 
 
-class SpoolWindow(Adw.ApplicationWindow):
+class GroveWindow(Adw.ApplicationWindow):
     def __init__(self, **kwargs):
         super().__init__(title='Grove', default_width=1000, default_height=720, **kwargs)
         self.client = Client()
@@ -88,7 +88,7 @@ class SpoolWindow(Adw.ApplicationWindow):
 
         def work():
             infos = self.client.catalog()
-            installed = packages.installed_versions([i.package for i in infos] + ['spool'])
+            installed = packages.installed_versions([i.package for i in infos] + ['grove'])
             return infos, installed
 
         packages.in_thread(work, self._loaded)
@@ -192,7 +192,7 @@ class SpoolWindow(Adw.ApplicationWindow):
             e.changed()
 
         def work():
-            folder = tempfile.mkdtemp(prefix='spool-')
+            folder = tempfile.mkdtemp(prefix='grove-')
             try:
                 paths = []
                 for e in entries:
@@ -292,8 +292,8 @@ class SpoolWindow(Adw.ApplicationWindow):
 
     def _on_about(self, _button):
         about = Adw.AboutDialog(
-            application_name='Grove', application_icon=f'io.github.{OWNER}.Spool', version=__version__,
-            developer_name='webhookstudios', website=f'https://github.com/{OWNER}/spool',
+            application_name='Grove', application_icon=f'io.github.{OWNER}.Grove', version=__version__,
+            developer_name='webhookstudios', website=f'https://github.com/{OWNER}/grove',
             comments='One library to install, update and remove every webhookstudios app.\n\nPart of the Sedge family of apps.',
             license_type=Gtk.License.GPL_2_0)
         about.present(self)

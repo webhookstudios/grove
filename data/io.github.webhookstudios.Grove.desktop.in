@@ -9,4 +9,4 @@ Terminal=false
 StartupNotify=true
 Categories=System;PackageManager;GTK;
 Keywords=spool;sedge;apps;install;update;store;library;webhookstudios;
-StartupWMClass=io.github.webhookstudios.Spool
+StartupWMClass=io.github.webhookstudios.Grove

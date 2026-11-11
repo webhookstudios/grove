@@ -4,10 +4,11 @@ Grove is the new name for Spool. It now has the Sedge look shared by every webho
 
 - New icon, colors and fonts. Window titles and headings use the Sedge serif.
 - Shows every app by its new name, with its new icon.
+- The package and command are now called `grove` (it was `spool`). Installing it replaces the old package.
 - Everything works exactly as before. Your settings and presets carry over.
 
 Install:
 
 ```bash
-sudo apt install ./spool_1.1.0_all.deb
+sudo apt install ./grove_1.1.0_all.deb
 ```

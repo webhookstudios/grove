@@ -6,10 +6,10 @@ gi.require_version('Adw', '1')
 from gi.repository import Adw, Gdk, Gtk  # noqa: E402
 
 from . import APP_ID  # noqa: E402
-from .window import SpoolWindow  # noqa: E402
+from .window import GroveWindow  # noqa: E402
 
 
-class SpoolApplication(Adw.Application):
+class GroveApplication(Adw.Application):
     def __init__(self):
         super().__init__(application_id=APP_ID)
 
@@ -24,5 +24,5 @@ class SpoolApplication(Adw.Application):
             Gdk.Display.get_default(), css, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
     def do_activate(self):
-        window = self.props.active_window or SpoolWindow(application=self)
+        window = self.props.active_window or GroveWindow(application=self)
         window.present()

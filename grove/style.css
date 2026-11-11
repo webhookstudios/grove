@@ -1,0 +1,9 @@
+.grove-card { padding: 16px; }
+.grove-card:hover { background-color: alpha(currentColor, 0.04); }
+.grove-name { font-family: "Young Serif", Georgia, serif; font-weight: normal; font-size: 16px; }
+.grove-badge { font-size: 11px; font-weight: 600; padding: 1px 8px; border-radius: 99px;
+  background-color: alpha(currentColor, 0.10); }
+.grove-badge.update { background-color: alpha(@accent_bg_color, 0.25); color: @accent_color; }
+.grove-badge.ok { background-color: alpha(@success_bg_color, 0.25); color: @success_color; }
+.grove-badge.logout { background-color: alpha(@warning_bg_color, 0.30); color: @warning_color; }
+.grove-notes { font-size: 13px; }

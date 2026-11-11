@@ -18,8 +18,7 @@ def load_icon(image, entry):
         image.set_from_gicon(Gio.FileIcon.new(Gio.File.new_for_path(bundled)))
         return
     theme = Gtk.IconTheme.get_for_display(image.get_display())
-    app_id_name = entry.info.repo[:1].upper() + entry.info.repo[1:]  # app ids keep the repo's name
-    for name in (f'io.github.{OWNER}.{app_id_name}', entry.info.repo):
+    for name in (f'io.github.{OWNER}.{entry.title}', entry.info.repo):
         if theme.has_icon(name):
             image.set_from_icon_name(name)
             return
@@ -38,7 +37,7 @@ def load_icon(image, entry):
 
 
 def badge(text, css=''):
-    label = Gtk.Label(label=text, css_classes=['spool-badge', *([css] if css else [])])
+    label = Gtk.Label(label=text, css_classes=['grove-badge', *([css] if css else [])])
     return label
 
 
@@ -69,7 +68,7 @@ class ActionButtons(Gtk.Box):
             self.remove_button.set_visible(False)
             return
         self.main.set_sensitive(True)
-        self.remove_button.set_visible(e.is_installed and e.info.package != 'spool')
+        self.remove_button.set_visible(e.is_installed and e.info.package != 'grove')
         if e.has_update:
             self.main.set_label('Update')
             self.main.add_css_class('suggested-action')
@@ -101,9 +100,9 @@ class AppCard(Gtk.FlowBoxChild):
         super().__init__()
         self.entry, self.window = entry, window
         self._pulse = 0
-        self.add_css_class('spool-card-child')
+        self.add_css_class('grove-card-child')
 
-        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10, css_classes=['card', 'spool-card'])
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10, css_classes=['card', 'grove-card'])
         self.set_child(box)
 
         top = Gtk.Box(spacing=14)
@@ -111,7 +110,7 @@ class AppCard(Gtk.FlowBoxChild):
         load_icon(self.icon, entry)
         top.append(self.icon)
         names = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2, valign=Gtk.Align.CENTER, hexpand=True)
-        names.append(Gtk.Label(label=entry.title, xalign=0, css_classes=['spool-name']))
+        names.append(Gtk.Label(label=entry.title, xalign=0, css_classes=['grove-name']))
         self.version = Gtk.Label(xalign=0, css_classes=['dim-label', 'caption'])
         names.append(self.version)
         top.append(names)

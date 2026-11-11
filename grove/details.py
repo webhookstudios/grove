@@ -59,7 +59,7 @@ class DetailsDialog(Adw.Dialog):
         if info.notes:
             notes = Adw.PreferencesGroup(title='What is new')
             notes.add(Gtk.Label(label=info.notes, wrap=True, xalign=0, selectable=True,
-                                css_classes=['spool-notes']))
+                                css_classes=['grove-notes']))
             page.append(notes)
 
         link = Gtk.LinkButton(uri=info.html_url, label='View on GitHub', halign=Gtk.Align.START)
