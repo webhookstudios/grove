@@ -29,7 +29,7 @@ chmod 644 "$STAGE/usr/share/applications/$APP_ID.desktop"
 
 cat > "$STAGE/usr/share/doc/grove/copyright" <<EOT
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: Grove (formerly Spool)
+Upstream-Name: Grove
 Source: https://github.com/webhookstudios/grove
 
 Files: *
@@ -59,7 +59,7 @@ Section: utils
 Priority: optional
 Homepage: https://github.com/webhookstudios/grove
 Description: Grove, one library for all webhookstudios apps
- Grove (formerly Spool) lists every app published by webhookstudios on GitHub, installs and
+ Grove lists every app published by webhookstudios on GitHub, installs and
  removes them with one click, and checks for new versions each time it
  opens. Installing and removing asks for your password once, through the
  normal system prompt.

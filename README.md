@@ -1,6 +1,6 @@
 # Grove
 
-*Formerly Spool. Part of the Sedge family of webhookstudios apps.*
+*Part of the Sedge family of webhookstudios apps.*
 
 One library for every [webhookstudios](https://github.com/webhookstudios) app on Ubuntu. Browse them as cards, install, update or remove any of them with a click, and see new versions as soon as you open it.
 
@@ -24,10 +24,10 @@ One library for every [webhookstudios](https://github.com/webhookstudios) app on
 
 ### With the deb package (recommended)
 
-Download `grove_1.1.0_all.deb` from the [latest release](https://github.com/webhookstudios/grove/releases/latest), then install it:
+Download `grove_1.1.1_all.deb` from the [latest release](https://github.com/webhookstudios/grove/releases/latest), then install it:
 
 ```bash
-sudo apt install ./grove_1.1.0_all.deb
+sudo apt install ./grove_1.1.1_all.deb
 ```
 
 Open **Grove** from the apps menu. After that, Grove can update itself like any other app in the list.

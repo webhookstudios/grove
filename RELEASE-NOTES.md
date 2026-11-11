@@ -1,14 +1,11 @@
-# Grove 1.1.0
+# Grove 1.1.1
 
-Grove is the new name for Spool. It now has the Sedge look shared by every webhookstudios app: one set of colors, fonts and icons, in light and dark mode.
+A small cleanup release. Everything else works exactly as before.
 
-- New icon, colors and fonts. Window titles and headings use the Sedge serif.
-- Shows every app by its new name, with its new icon.
-- The package and command are now called `grove` (it was `spool`). Installing it replaces the old package.
-- Everything works exactly as before. Your settings and presets carry over.
+- The package details in app stores and `apt show` no longer mention an old name.
 
 Install:
 
 ```bash
-sudo apt install ./grove_1.1.0_all.deb
+sudo apt install ./grove_1.1.1_all.deb
 ```
