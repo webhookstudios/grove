@@ -9,7 +9,7 @@ One library for every [webhookstudios](https://github.com/webhookstudios) app on
 ## What it does
 
 - **Sets up a new computer in one go.** The first time Grove opens, it lists every app with a checkbox. Leave them all ticked or pick the ones you want, press **Install selected**, and Grove installs them together with one password prompt.
-- **Finds the apps by itself.** It reads webhookstudios' public repos on GitHub and lists every one whose latest release has a `.deb`. A new app shows up the day it is released, with no update to Grove.
+- **Finds the apps by itself.** It reads webhookstudios' public repos on GitHub and lists every Linux app: each one whose latest release has a Debian package (`.deb`). A new app shows up the day it is released, with no update to Grove. Repos for other systems are left out.
 - **Checks for updates every time it opens**, and shows a banner with an **Update all** button.
 - **Installs, updates and removes** through apt, so dependencies are handled and everything appears in the normal package list. You are asked for your password once, by the standard system prompt.
 - **Shows each app's details:** description, versions, size, release notes and its screenshots.
@@ -25,10 +25,10 @@ One library for every [webhookstudios](https://github.com/webhookstudios) app on
 
 ### With the deb package (recommended)
 
-Download `grove_1.2.0_all.deb` from the [latest release](https://github.com/webhookstudios/grove/releases/latest), then install it:
+Download `grove_1.2.1_all.deb` from the [latest release](https://github.com/webhookstudios/grove/releases/latest), then install it:
 
 ```bash
-sudo apt install ./grove_1.2.0_all.deb
+sudo apt install ./grove_1.2.1_all.deb
 ```
 
 Open **Grove** from the apps menu. After that, Grove can update itself like any other app in the list.
@@ -62,7 +62,7 @@ git clone https://github.com/webhookstudios/grove.git
 | See details and screenshots | Click an app's icon or name |
 | Check again | Click the refresh button at the top left |
 
-The **Installed** and **Updates** tabs filter the list, and the search box matches names and descriptions.
+The **Installed** and **Updates** tabs filter the list. To search names and descriptions, click the search button at the top right, press <kbd>Ctrl</kbd>+<kbd>F</kbd>, or just start typing.
 
 Shell extensions, such as Sprig and Sheaf, only turn on after you log out and back in. Grove sets new ones to turn on, and after a setup it offers one **Log out** for all of them.
 
@@ -91,7 +91,7 @@ Grove asks the GitHub API for the owner's repos and each one's latest release. A
 
 ## Limitations
 
-- Only apps with a `.deb` in their latest GitHub release are listed.
+- Only apps with a Debian package (`<name>_<version>_<arch>.deb`) in their latest GitHub release are listed. A repo tagged with another system's topic, such as `windows`, `macos`, `android`, `ios` or `web`, is left out unless it is also tagged `linux`.
 - GitHub allows 60 anonymous requests an hour. Opening Grove uses about ten, and unchanged answers are free, so this is only a problem if you reopen it dozens of times in an hour.
 - Removing an app keeps its settings, the way `apt remove` does.
 - Ollama's installer comes straight from ollama.com. Unlike the apps, it has no published checksum for Grove to check.

@@ -1,5 +1,6 @@
-"""Finds the apps on GitHub: every public repo of the owner whose latest
-release carries a .deb package."""
+"""Finds the apps on GitHub: every public repo of the owner that is a Linux
+app, meaning its latest release carries a Debian package (.deb) and the repo
+is not tagged as being for another system."""
 import json
 import os
 import threading
@@ -13,6 +14,13 @@ from . import OWNER, __version__
 
 API = 'https://api.github.com'
 RAW = 'https://raw.githubusercontent.com'
+# Repo topics that mark an app for another system. A repo with one of these is
+# skipped unless it is also tagged 'linux'.
+OTHER_SYSTEMS = {'windows', 'win32', 'win64', 'macos', 'mac', 'osx', 'darwin', 'android', 'ios', 'ipados',
+                 'watchos', 'tvos', 'visionos', 'web', 'webapp', 'website', 'browser-extension',
+                 'chrome-extension', 'firefox-addon', 'firefox-extension'}
+# Package architectures Debian and Ubuntu use; anything else is not a Linux package.
+DEBIAN_ARCHES = {'all', 'amd64', 'arm64', 'armhf', 'armel', 'i386', 'riscv64', 'ppc64el', 's390x', 'loong64'}
 CACHE_DIR = os.path.join(os.environ.get('XDG_CACHE_HOME') or os.path.expanduser('~/.cache'), 'grove')
 
 
@@ -118,7 +126,8 @@ class Client:
 
     def catalog(self):
         repos = self.get(f'{API}/users/{OWNER}/repos?per_page=100&type=owner') or []
-        repos = [r for r in repos if not r.get('fork') and not r.get('archived')]
+        repos = [r for r in repos if not r.get('fork') and not r.get('archived') and not r.get('is_template')
+                 and is_linux_repo(r)]
 
         def one(repo):
             release = self.get(f"{API}/repos/{OWNER}/{repo['name']}/releases/latest")
@@ -134,7 +143,7 @@ class Client:
         if not release:
             return None
         assets = release.get('assets', [])
-        deb = next((a for a in assets if a['name'].endswith('.deb')), None)
+        deb = next((a for a in assets if is_debian_package(a['name'])), None)
         if deb is None:
             return None
         tag = release.get('tag_name', '')
@@ -152,7 +161,7 @@ class Client:
             deb_digest=deb.get('digest') or '',
             is_extension=bool(zipped),
             extension_uuid=zipped[:-len('.shell-extension.zip')] if zipped else '',
-            arch=deb['name'][:-len('.deb')].rsplit('_', 1)[-1] if deb['name'].count('_') >= 2 else 'all',
+            arch=deb['name'][:-len('.deb')].rsplit('_', 1)[-1],
             html_url=repo['html_url'],
             notes=(release.get('body') or '').strip(),
             published=(release.get('published_at') or '')[:10],
@@ -166,6 +175,21 @@ class Client:
         self._save()
         return [f['download_url'] for f in listing
                 if f.get('download_url') and f['name'].lower().endswith(('.png', '.jpg', '.jpeg', '.webp'))]
+
+
+def is_linux_repo(repo):
+    """False for a repo tagged as an app for another system, such as windows
+    or android, unless it is tagged linux as well."""
+    topics = {t.lower() for t in repo.get('topics') or []}
+    return 'linux' in topics or not topics & OTHER_SYSTEMS
+
+
+def is_debian_package(name):
+    """True for a Debian package file name: <name>_<version>_<arch>.deb."""
+    if not name.endswith('.deb'):
+        return False
+    parts = name[:-len('.deb')].split('_')
+    return len(parts) == 3 and all(parts) and parts[2] in DEBIAN_ARCHES
 
 
 def download(url, destination, progress=None, digest=''):

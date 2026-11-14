@@ -2,7 +2,7 @@ import os
 import shutil
 import tempfile
 
-from gi.repository import Adw, Gio, GLib, Gtk
+from gi.repository import Adw, Gio, GLib, GObject, Gtk
 
 from . import OWNER, __version__, ollama, packages, state
 from .card import AppCard
@@ -52,10 +52,30 @@ class GroveWindow(Adw.ApplicationWindow):
             action.connect('activate', lambda *_, callback=callback: callback())
             self.add_action(action)
         self.lookup_action('setup').set_enabled(False)
-        self.search = Gtk.SearchEntry(placeholder_text='Search apps', width_chars=22)
-        self.search.connect('search-changed', lambda *_: self.flow.invalidate_filter())
-        header.pack_end(self.search)
+
+        # Search is an icon that opens a bar under the header, so the filter
+        # buttons keep the middle of the header to themselves. Typing anywhere
+        # or pressing Ctrl+F opens it too.
+        self.search_button = Gtk.ToggleButton(icon_name='system-search-symbolic', tooltip_text='Search apps')
+        header.pack_end(self.search_button)
         view.add_top_bar(header)
+        self.search = Gtk.SearchEntry(placeholder_text='Search apps', hexpand=True)
+        self.search.connect('search-changed', lambda *_: self.flow.invalidate_filter())
+        clamp = Adw.Clamp(maximum_size=480, child=self.search)
+        self.searchbar = Gtk.SearchBar(child=clamp)
+        self.searchbar.connect_entry(self.search)
+        self.searchbar.set_key_capture_widget(self)
+        self.search_button.bind_property('active', self.searchbar, 'search-mode-enabled',
+                                         GObject.BindingFlags.BIDIRECTIONAL | GObject.BindingFlags.SYNC_CREATE)
+        self.searchbar.connect('notify::search-mode-enabled',
+                               lambda bar, _p: None if bar.get_search_mode() else self.search.set_text(''))
+        find = Gtk.ShortcutController(scope=Gtk.ShortcutScope.MANAGED)
+        find.add_shortcut(Gtk.Shortcut.new(
+            Gtk.ShortcutTrigger.parse_string('<Control>f'),
+            Gtk.CallbackAction.new(lambda *_: self.search_button.set_active(not self.search_button.get_active())
+                                   or True)))
+        self.add_controller(find)
+        view.add_top_bar(self.searchbar)
 
         self.banner = Adw.Banner(revealed=False, button_label='Update all')
         self.banner.connect('button-clicked', lambda *_: self.install([e for e in self.entries if e.has_update]))
