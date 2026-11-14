@@ -4,11 +4,12 @@ import tempfile
 
 from gi.repository import Adw, Gio, GLib, Gtk
 
-from . import OWNER, __version__, packages
+from . import OWNER, __version__, ollama, packages, state
 from .card import AppCard
 from .details import DetailsDialog
 from .github import Client, GitHubError, download
 from .model import Entry
+from .setup import SetupDialog
 
 
 class GroveWindow(Adw.ApplicationWindow):
@@ -18,6 +19,7 @@ class GroveWindow(Adw.ApplicationWindow):
         self.entries = []
         self.cards = {}
         self.mode = 'all'
+        self.setup_checked = False
 
         self.toasts = Adw.ToastOverlay()
         self.set_content(self.toasts)
@@ -40,9 +42,16 @@ class GroveWindow(Adw.ApplicationWindow):
         self.refresh_button.connect('clicked', lambda *_: self.reload())
         header.pack_start(self.refresh_button)
 
-        about = Gtk.Button(icon_name='help-about-symbolic', tooltip_text='About Grove')
-        about.connect('clicked', self._on_about)
-        header.pack_end(about)
+        menu = Gio.Menu()
+        menu.append('Set up apps…', 'win.setup')
+        menu.append('About Grove', 'win.about')
+        header.pack_end(Gtk.MenuButton(icon_name='open-menu-symbolic', tooltip_text='Main menu',
+                                       menu_model=menu, primary=True))
+        for name, callback in (('setup', self.show_setup), ('about', self._on_about)):
+            action = Gio.SimpleAction.new(name, None)
+            action.connect('activate', lambda *_, callback=callback: callback())
+            self.add_action(action)
+        self.lookup_action('setup').set_enabled(False)
         self.search = Gtk.SearchEntry(placeholder_text='Search apps', width_chars=22)
         self.search.connect('search-changed', lambda *_: self.flow.invalidate_filter())
         header.pack_end(self.search)
@@ -123,6 +132,13 @@ class GroveWindow(Adw.ApplicationWindow):
         self.stack.set_visible_child_name('apps')
         self.flow.invalidate_filter()
         self.flow.invalidate_sort()
+        self.lookup_action('setup').set_enabled(bool(self.entries))
+        if not self.setup_checked:
+            self.setup_checked = True
+            # A new computer: nothing from the library is installed except Grove.
+            if not state.get('setup_shown') and not any(
+                    e.is_installed for e in self.entries if e.info.package != 'grove'):
+                GLib.idle_add(lambda: self.show_setup() or False)
 
     def _after_change(self):
         updates = [e for e in self.entries if e.has_update]
@@ -170,6 +186,10 @@ class GroveWindow(Adw.ApplicationWindow):
 
     # ---- actions ---------------------------------------------------------
 
+    def show_setup(self):
+        state.set('setup_shown', True)
+        SetupDialog(self).present(self)
+
     def show_details(self, entry):
         DetailsDialog(entry, self).present(self)
 
@@ -183,9 +203,16 @@ class GroveWindow(Adw.ApplicationWindow):
             self.toasts.add_toast(Adw.Toast(title='Log out and back in first, so it can turn on.'))
         app.launch([], None)
 
-    def install(self, entries):
-        entries = [e for e in entries if not e.busy]
-        if not entries:
+    def install(self, entries, on_line=None, on_done=None, with_ollama=False):
+        """Downloads and installs apps with one apt run, so one password prompt.
+        with_ollama also runs Ollama's official installer in that same prompt.
+        on_line gets each line the install prints; on_done(ok, message,
+        turned_on, ollama_ok) is called at the end, and when it returns True
+        the window adds no toast."""
+        entries = [e for e in entries if not e.busy and e.available]
+        if not entries and not with_ollama:
+            if on_done:
+                on_done(False, 'Nothing could be installed.', [], None)
             return
         for e in entries:
             e.busy, e.progress = 'Downloading', 0.0
@@ -202,11 +229,18 @@ class GroveWindow(Adw.ApplicationWindow):
                     os.chmod(path, 0o644)
                     paths.append(path)
                 GLib.idle_add(self._set_busy, entries, 'Installing')
-                return packages.run_root(['apt-get', 'install', '-y', *paths])
+                line = (lambda text: GLib.idle_add(lambda: on_line(text) or False)) if on_line else None
+                if not with_ollama:
+                    return packages.run_root(['apt-get', 'install', '-y', *paths], line)
+                script = os.path.join(folder, 'ollama-install.sh')
+                download(ollama.INSTALLER, script)
+                os.chmod(script, 0o644)
+                return packages.run_root([f'GROVE_OLLAMA={script}', 'sh', '-c', ollama.ROOT_SCRIPT, 'grove',
+                                          *paths, *ollama.NEEDS], line)
             finally:
                 shutil.rmtree(folder, ignore_errors=True)
 
-        packages.in_thread(work, lambda r, err: self._install_done(entries, r, err))
+        packages.in_thread(work, lambda r, err: self._install_done(entries, r, err, on_done, with_ollama))
 
     def _progress(self, entry, fraction):
         entry.progress = fraction
@@ -219,22 +253,44 @@ class GroveWindow(Adw.ApplicationWindow):
             e.changed()
         return False
 
-    def _install_done(self, entries, result, error):
-        names = ', '.join(e.title for e in entries)
+    def _install_done(self, entries, result, error, on_done=None, with_ollama=False):
+        def failed(message, output=''):
+            for e in entries:
+                e.busy = ''
+                e.changed()
+            shown = on_done(False, message, [], False if with_ollama else None) if on_done else False
+            if output or not shown:
+                self._report(message, output)
+
+        names = ', '.join([e.title for e in entries] + (['Ollama'] if with_ollama else []))
         if error:
-            return self._fail(entries, str(error))
+            return failed(str(error))
         code, output = result
         if code in (126, 127):
-            return self._fail(entries, 'Cancelled. Nothing was installed.')
+            return failed('Cancelled. Nothing was installed.')
+        ollama_ok = None
+        if with_ollama:
+            ollama_ok = code == 0
+            if code == 20 and not entries:
+                return failed('Ollama did not install.', output)
+            if code == 20:  # the apps are in; only Ollama's installer failed
+                code = 0
+                names = ', '.join(e.title for e in entries)
+                self._report('Ollama did not install. Fleece needs it to run models; you can get it from '
+                             'ollama.com/download.', output)
         if code != 0:
-            return self._fail(entries, 'The install did not finish.', output)
+            return failed('The install did not finish.', output)
         fresh = [e for e in entries if e.info.is_extension and not e.is_installed]
         self._settle(entries)
+        fresh = [e for e in fresh if e.is_installed]
+        # New extensions are set to turn on, so they start at the next login.
+        packages.enable_extensions([e.info.extension_uuid for e in fresh])
         for e in fresh:
-            e.needs_logout = e.is_installed
+            e.needs_logout = True
             e.changed()
-        extension = any(e.info.is_extension for e in entries)
-        toast = Adw.Toast(title=f'{names} installed.' + (' Log out and back in to turn on new extensions.' if extension else ''))
+        if on_done and on_done(True, f'{names} installed.', fresh, ollama_ok):
+            return
+        toast = Adw.Toast(title=f'{names} installed.' + (' Log out and back in to turn on new extensions.' if fresh else ''))
         toast.set_timeout(8)
         self.toasts.add_toast(toast)
 
@@ -280,6 +336,9 @@ class GroveWindow(Adw.ApplicationWindow):
         for e in entries:
             e.busy = ''
             e.changed()
+        self._report(message, output)
+
+    def _report(self, message, output=''):
         if output:
             dialog = Adw.AlertDialog(heading='Something went wrong', body=message)
             tail = '\n'.join(output.strip().splitlines()[-12:])
@@ -290,7 +349,7 @@ class GroveWindow(Adw.ApplicationWindow):
         else:
             self.toasts.add_toast(Adw.Toast(title=message))
 
-    def _on_about(self, _button):
+    def _on_about(self, *_):
         about = Adw.AboutDialog(
             application_name='Grove', application_icon=f'io.github.{OWNER}.Grove', version=__version__,
             developer_name='webhookstudios', website=f'https://github.com/{OWNER}/grove',

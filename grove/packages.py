@@ -35,6 +35,49 @@ def desktop_file(package):
     return None
 
 
+_ARCH = []
+
+
+def architecture():
+    """This computer's package architecture, such as amd64 or arm64."""
+    if not _ARCH:
+        try:
+            _ARCH.append(subprocess.run(['dpkg', '--print-architecture'], capture_output=True,
+                                        text=True).stdout.strip())
+        except OSError:
+            _ARCH.append('')
+    return _ARCH[0]
+
+
+def enable_extensions(uuids):
+    """Adds shell extensions to GNOME's list of turned-on extensions, so they
+    start at the next login. Returns the ones that were added."""
+    from gi.repository import Gio
+    source = Gio.SettingsSchemaSource.get_default()
+    uuids = [u for u in uuids if u]
+    if not uuids or source is None or source.lookup('org.gnome.shell', True) is None:
+        return []
+    settings = Gio.Settings.new('org.gnome.shell')
+    enabled = list(settings.get_strv('enabled-extensions'))
+    added = [u for u in uuids if u not in enabled]
+    if added:
+        settings.set_strv('enabled-extensions', enabled + added)
+    disabled = list(settings.get_strv('disabled-extensions'))
+    if any(u in disabled for u in uuids):
+        settings.set_strv('disabled-extensions', [u for u in disabled if u not in uuids])
+    Gio.Settings.sync()
+    return added
+
+
+def log_out():
+    """Asks GNOME to log out, with its usual confirmation. False if that isn't possible."""
+    try:
+        subprocess.Popen(['gnome-session-quit', '--logout'])
+        return True
+    except OSError:
+        return False
+
+
 def run_root(argv, on_output=None):
     """Runs a command as root through polkit. Returns (exit code, output).
     pkexec exits with 126 when the password prompt is dismissed and 127 when

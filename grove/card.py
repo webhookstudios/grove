@@ -5,7 +5,7 @@ from gi.repository import Gio, GLib, Gtk
 
 from . import OWNER, packages
 from .github import fetch_cached, icon_urls
-from .model import human_size
+from .model import arch_note, human_size
 
 SEDGE_ICONS = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'sedge', 'apps')
 
@@ -68,8 +68,13 @@ class ActionButtons(Gtk.Box):
             self.remove_button.set_visible(False)
             return
         self.main.set_sensitive(True)
+        self.main.set_tooltip_text(None)
         self.remove_button.set_visible(e.is_installed and e.info.package != 'grove')
-        if e.has_update:
+        if not e.available and not e.is_installed:
+            self.main.set_label('Not available')
+            self.main.set_sensitive(False)
+            self.main.set_tooltip_text(arch_note(e.info))
+        elif e.has_update:
             self.main.set_label('Update')
             self.main.add_css_class('suggested-action')
         elif e.is_installed:

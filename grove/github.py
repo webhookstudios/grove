@@ -37,6 +37,8 @@ class AppInfo:
     deb_size: int
     deb_digest: str
     is_extension: bool
+    extension_uuid: str
+    arch: str
     html_url: str
     notes: str
     published: str
@@ -136,6 +138,7 @@ class Client:
         if deb is None:
             return None
         tag = release.get('tag_name', '')
+        zipped = next((a['name'] for a in assets if a['name'].endswith('.shell-extension.zip')), '')
         return AppInfo(
             repo=repo['name'],
             title=repo['name'][:1].upper() + repo['name'][1:],
@@ -147,7 +150,9 @@ class Client:
             deb_url=deb['browser_download_url'],
             deb_size=deb.get('size', 0),
             deb_digest=deb.get('digest') or '',
-            is_extension=any(a['name'].endswith('.shell-extension.zip') for a in assets),
+            is_extension=bool(zipped),
+            extension_uuid=zipped[:-len('.shell-extension.zip')] if zipped else '',
+            arch=deb['name'][:-len('.deb')].rsplit('_', 1)[-1] if deb['name'].count('_') >= 2 else 'all',
             html_url=repo['html_url'],
             notes=(release.get('body') or '').strip(),
             published=(release.get('published_at') or '')[:10],
